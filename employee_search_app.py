@@ -1,8 +1,9 @@
 import streamlit as st
 import pandas as pd
+import io
 
 st.set_page_config(page_title="نظام البحث عن الموظف", layout="wide")
-st.title("🔎 نظام البحث عن معلومات الموظف")
+st.title("🔍 نظام البحث عن معلومات الموظف")
 
 @st.cache_data
 def load_data():
@@ -22,8 +23,19 @@ if query.strip():
     if not results.empty:
         st.success(f"✅ تم العثور على {len(results)} نتيجة مطابقة")
         st.dataframe(results, use_container_width=True)
-        with st.expander("📤 تصدير النتائج"):
-            st.download_button("💾 تحميل Excel", data=results.to_excel(index=False), file_name="search_results.xlsx")
+        
+        # ✅ تصدير النتائج باستخدام BytesIO
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+            results.to_excel(writer, index=False, sheet_name='SearchResults')
+        output.seek(0)
+
+        st.download_button(
+            "📥 تحميل النتائج كملف Excel",
+            data=output,
+            file_name="search_results.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
     else:
         st.warning("⚠️ لم يتم العثور على نتائج")
 else:
