@@ -24,9 +24,9 @@ if query.strip():
         st.success(f"✅ تم العثور على {len(results)} نتيجة مطابقة")
         st.dataframe(results, use_container_width=True)
         
-        # ✅ تصدير النتائج باستخدام BytesIO
+        # ✅ تصدير النتائج باستخدام openpyxl
         output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
             results.to_excel(writer, index=False, sheet_name='SearchResults')
         output.seek(0)
 
